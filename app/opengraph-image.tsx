@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
+// 빌드 시점에 PNG로 미리 생성해 CDN 정적 자산으로 서빙한다. edge 런타임으로
+// 두면 요청마다 즉석 렌더(ƒ)라 카카오톡 같은 스크래퍼가 타임아웃될 수 있다.
 export const alt = "카커넥트 미디어 — 프라이빗 모빌리티 어드바이저리";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -29,7 +30,9 @@ export default function OpengraphImage() {
             letterSpacing: 10,
             borderBottom: "2px solid #d4af6a",
             paddingBottom: 20,
-            width: "fit-content",
+            // Satori는 width:"fit-content"를 지원하지 않아 렌더가 통째로 실패한다.
+            // 컬럼 플렉스에서 내용 너비로 줄이려면 alignSelf를 쓴다.
+            alignSelf: "flex-start",
           }}
         >
           CARCONNECT MEDIA
