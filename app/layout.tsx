@@ -27,9 +27,11 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     type: "website",
   },
-  // ⚠ 구글/네이버 서치콘솔 소유확인 코드는 도메인마다 새로 발급받아야 한다
-  // (RENTO 코드를 그대로 두면 엉뚱한 사이트를 인증하려다 실패한다) — 실제
-  // 배포 도메인 확정 후 각 서치콘솔에서 새로 받아 채워 넣는다.
+  verification: {
+    // 네이버 서치어드바이저에서 이 도메인으로 새로 발급받은 코드.
+    // ⚠ 구글 서치콘솔 코드는 아직 미발급 — 발급 후 google 필드를 추가한다.
+    other: { "naver-site-verification": "d3a91aa5459ec5125282ad1aaf45853a2c302134" },
+  },
 };
 
 const ORG_JSON_LD = {
