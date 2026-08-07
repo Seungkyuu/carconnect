@@ -17,8 +17,13 @@ import { listShinhanModels } from "./shinhan";
 import { listMeritzVehicles } from "./meritz";
 import { listDomesticVehicles } from "./meritz-domestic";
 import { listRentalVehicles } from "./meritz-rental-domestic";
+import { listImportRentalVehicles } from "./meritz-rental-import";
+import { listBnkVehicles } from "./bnk";
+import { listMgRentalVehicles } from "./mg-rental";
+import { listMgLeaseVehicles } from "./mg-lease";
 import teslaVehiclesJson from "./meritz-tesla/data/vehicles.json";
 import bydVehiclesJson from "./meritz-byd/data/vehicles.json";
+import { listPolestarLeaseVehicles } from "./meritz-polestar";
 import shinhanRentalJson from "./shinhan/data/rental-vehicles.json";
 import { approxPrice } from "./approx-prices";
 import { importRealPrice, importOfferKey } from "./import-real-price";
@@ -95,6 +100,9 @@ const DECORATIONS: RegExp[] = [
   /^\(\d{2}\.\d{2}\)\s*/, // (25.08) 같은 시점 접두
   /\s1-1$/,               // 내부 변형 접미
   /\((NX4|CN7)\)/g,       // 플랫폼 코드
+  /^BYD\s+/,              // 브랜드 칩으로 이미 보이는 "BYD" 접두어(표시명만 정리,
+                          // ref.model엔 원본 그대로 남아 카탈로그 조회는 안 깨짐)
+  /^폴스타\s+/,            // 위와 동일 이유 — "폴스타 폴스타 4 듀얼모터"처럼 중복 방지
 ];
 
 export function cleanDisplayName(label: string): string {
@@ -150,8 +158,13 @@ function splitMeritzBrand(key: string): { brand: string; rest: string } {
 
 const GENESIS_PATTERN = /\b(G70|G80|G90|GV60|GV70|GV80)\b/i;
 
-function domesticBrand(label: string): string {
-  return GENESIS_PATTERN.test(label) ? "제네시스" : "현대";
+// 메리츠 국산(리스·렌트) 카탈로그 브랜드는 실데이터(v.brand)를 그대로 쓴다 —
+// 제네시스만 예외로, 카탈로그 브랜드가 "현대"로 뭉뚱그려 있어도 모델코드로
+// 재분류해야 한다(예전엔 이 재분류 로직을 "전체 도메스틱 브랜드 판별"로
+// 잘못 확장해서 기아/KGM/르노/쉐보레까지 전부 "현대"로 오분류했었다 — 그랑
+// 콜레오스/쏘렌토/스포티지/토레스/필랑트/액티언 버그).
+function domesticBrand(label: string, catalogBrand: string): string {
+  return GENESIS_PATTERN.test(label) ? "제네시스" : catalogBrand.replace(/자동차$/, "") || "현대";
 }
 
 // ─── 인덱스 빌드 ─────────────────────────────────────────────────────────────
@@ -247,20 +260,69 @@ export function buildVehicleIndex(): IndexedVehicle[] {
     add(brand, rest, "meritz-import", importRealPrice(key, v.vehiclePrice), importOfferKey(key));
   }
   // 메리츠 국산차
-  for (const [key] of listDomesticVehicles()) {
-    add(domesticBrand(key), key, "meritz-domestic-lease", approxPrice(key, 38_000_000));
+  for (const [key, v] of listDomesticVehicles()) {
+    add(domesticBrand(key, v.brand), key, "meritz-domestic-lease", approxPrice(key, 38_000_000));
   }
-  // 메리츠 국산 장기렌트
-  for (const [key] of listRentalVehicles()) {
-    add(domesticBrand(key), key, "meritz-rental-domestic", approxPrice(key, 38_000_000));
+  // 메리츠 국산 장기렌트 — "[프로모션]"/"[Select 프로모션]" 접두 모델은 같은
+  // 실차의 별도 판매조건 변형이라 정제명이 안 겹쳐(대괄호가 DECORATIONS에
+  // 없어 안 벗겨짐) 기본 트림과 별개의 카드로 중복 노출되고, 심지어 브랜드
+  // 표기까지 기본 트림과 어긋나 보이는 문제가 있었다 — 사용자 확정: 이런
+  // 프로모션/특판 변형은 카탈로그에서 아예 제외하고 기본 트림만 남긴다.
+  const PROMO_LABEL_RE = /^\[(Select\s*)?프로모션\]\s*/;
+  for (const [key, v] of listRentalVehicles()) {
+    if (PROMO_LABEL_RE.test(key)) continue;
+    add(domesticBrand(key, v.brand), key, "meritz-rental-domestic", approxPrice(key, 38_000_000));
   }
   // 메리츠 테슬라
   for (const key of jsonModelNames(teslaVehiclesJson as Record<string, unknown>)) {
     add("테슬라", key, "meritz-tesla-lease", approxPrice(key, 55_000_000));
   }
   // 메리츠 BYD
+  // ⚠ 과거엔 여기서 "BYD " 접두어를 벗기고 넘겼는데, meritz-byd 카탈로그
+  //   자체가 "BYD ATTO 3"처럼 접두어를 포함한 키로 저장돼 있어(findBydVehicle
+  //   조회 실패) 이 소스로는 견적이 조용히 하나도 안 나오고 있었다 —
+  //   ref.model은 원본 키 그대로 넘겨야 한다(아래 meritz-rental-import와 동일 원칙).
   for (const key of jsonModelNames(bydVehiclesJson as Record<string, unknown>)) {
-    add("BYD", key.replace(/^BYD\s*/i, ""), "meritz-byd-lease", approxPrice(key, 32_000_000));
+    add("BYD", key, "meritz-byd-lease", approxPrice(key, 32_000_000));
+  }
+  // 메리츠 Polestar 전용 운용리스 — Polestar 4 생산배치별(1~3차시) 세부 트림.
+  // 마스터에 차량가가 없어(엑셀도 매 견적 시세 수기입력) approxPrice로만 표시.
+  for (const [key] of listPolestarLeaseVehicles()) {
+    add("Polestar", key, "meritz-polestar-lease", approxPrice(key, 70_000_000));
+  }
+  // 메리츠 수입(EV) 장기렌트 — 테슬라·폴스타·BYD(전 모델 EV).
+  // ⚠ add()의 두 번째 인자(rawLabel)는 ref.model로 그대로 저장되고,
+  //   견적 시점에 그 값 그대로 findImportRentalVehicle()에 넘어가 카탈로그
+  //   (data/vehicles.json) 키와 정확히 일치해야 한다 — 브랜드 접두어를
+  //   벗겨서 넘기면(예전 메리츠 BYD 리스 블록의 실수) 카탈로그에 없는 이름을
+  //   조회하게 돼 "이 차량을 취급하지 않아요"로 조용히 실패한다. 표시용
+  //   브랜드만 별도로 넘기고 원본 키는 그대로 보존한다.
+  for (const [key] of listImportRentalVehicles()) {
+    if (key.startsWith("BYD")) {
+      add("BYD", key, "meritz-rental-import", approxPrice(key, 32_000_000));
+    } else if (key.startsWith("폴스타")) {
+      add("폴스타", key, "meritz-rental-import", approxPrice(key, 80_000_000));
+    } else {
+      add("테슬라", key, "meritz-rental-import", approxPrice(key, 55_000_000));
+    }
+  }
+  // BNK캐피탈 — 브랜드가 카탈로그(CDB)에 이미 정확히 들어있어 그대로 사용.
+  // 차량가는 CDB에 없음(잔가사 자동선택 구조라 엑셀도 겟챠 시세를 그때그때
+  // 입력받는 방식) — 겟챠 실가격을 우선 쓰고 없으면 근사치로 대체.
+  for (const v of listBnkVehicles()) {
+    add(v.brand, v.model, "bnk-operating-lease", importRealPrice(v.model, approxPrice(v.model, 45_000_000)));
+  }
+  // MG캐피탈 — EV 전용 장기렌터카(14개 모델). 원본 브랜드가 전부
+  // "현대자동차"/"기아자동차"인데 G80_EV·GV60·GV70은 실제로 제네시스라
+  // GENESIS_PATTERN으로 재분류하고, "_"는 공백으로 정리해서 표시한다.
+  for (const [key, v] of listMgRentalVehicles()) {
+    const display = key.replace(/_/g, " ");
+    const brand = GENESIS_PATTERN.test(display) ? "제네시스" : v.brand.replace(/자동차$/, "");
+    add(brand, display, "mg-rental", importRealPrice(key, approxPrice(key, 50_000_000)));
+  }
+  // MG캐피탈 — 운용리스(235개 모델, 브랜드는 카탈로그에 이미 정확히 들어있음)
+  for (const [key, v] of listMgLeaseVehicles()) {
+    add(v.brand, key, "mg-lease", importRealPrice(key, approxPrice(key, v.vehiclePrice)));
   }
 
   // ─── 소스 간 병합(겟챠 등급 식별자 기준) ─────────────────────────────────

@@ -117,9 +117,17 @@ def extract_initial_prices(html: str, brand_id: int) -> dict | None:
             decoded = json.loads('"' + raw + '"')
         except (json.JSONDecodeError, ValueError):
             continue
-        # RSC 스트리밍 포맷이라 앞에 "29:" 같은 청크 번호가 붙어있다.
-        m = re.match(r"^\d+:(.*)$", decoded, re.DOTALL)
+        # RSC 스트리밍 포맷이라 앞에 청크 번호가 붙어있다 — 이 번호는 10진수가
+        # 아니라 16진수라 "2b:" 같은 값이 나온다(글자가 섞임). \d+(10진수)만
+        # 벗기면 "2b:" 같은 건 못 벗기고 그대로 json.loads에 넘어가 파싱이
+        # 깨진다(2026-07-28 장애 원인, topgo에서 실측 확인).
+        m = re.match(r"^[0-9a-fA-F]+:(.*)$", decoded, re.DOTALL)
         payload = m.group(1) if m else decoded
+        # 청크가 커지면 Next가 "T<16진수 길이>,<원문>" 텍스트 로우로 보낸다
+        # (JSON이 아니라 태그+길이+원문) — 이 태그를 벗겨야 실제 JSON이 나온다.
+        tm = re.match(r"^T[0-9a-fA-F]+,(.*)$", payload, re.DOTALL)
+        if tm:
+            payload = tm.group(1)
         try:
             data = json.loads(payload)
         except json.JSONDecodeError:
@@ -158,8 +166,14 @@ def extract_brand_logos(html: str) -> dict[str, str]:
             decoded = json.loads('"' + raw + '"')
         except (json.JSONDecodeError, ValueError):
             continue
-        m = re.match(r"^\d+:(.*)$", decoded, re.DOTALL)
+        # extract_initial_prices()와 동일한 버그 — 청크 ID가 16진수라
+        # \d+로는 못 벗긴다("2b:" 같은 값). brand-logos.json이 계속
+        # {}(빈 값)로 저장되던 원인이 이거였다.
+        m = re.match(r"^[0-9a-fA-F]+:(.*)$", decoded, re.DOTALL)
         payload = m.group(1) if m else decoded
+        tm = re.match(r"^T[0-9a-fA-F]+,(.*)$", payload, re.DOTALL)
+        if tm:
+            payload = tm.group(1)
         try:
             data = json.loads(payload)
         except json.JSONDecodeError:

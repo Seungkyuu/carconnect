@@ -31,8 +31,13 @@ import {
 } from "./meritz";
 import { quoteMeritzDomesticLease, findDomesticVehicle } from "./meritz-domestic";
 import { quoteMeritzDomesticRental, findRentalVehicle } from "./meritz-rental-domestic";
+import { quoteMeritzImportRental, findImportRentalVehicle } from "./meritz-rental-import";
+import { quoteBnkOperatingLease, findBnkVehicle } from "./bnk";
+import { quoteMgRental, findMgRentalVehicle } from "./mg-rental";
+import { quoteMgLease, findMgLeaseVehicle } from "./mg-lease";
 import { quoteMeritzTeslaLease, findTeslaVehicle } from "./meritz-tesla";
 import { quoteMeritzBydLease, findBydVehicle } from "./meritz-byd";
+import { quoteMeritzPolestarLease, findPolestarLeaseVehicle } from "./meritz-polestar";
 import type { MeritzEvLeaseQuote } from "./meritz-ev/lease";
 
 export type DealType = "operatingLease" | "financeLease" | "longTermRental";
@@ -297,6 +302,108 @@ function meritzDomesticRentalQuote(id: string, deal: DealType, input: CapitalQuo
   }
 }
 
+function meritzImportRentalQuote(id: string, deal: DealType, input: CapitalQuoteInput): CapitalQuoteRow {
+  const capital = "메리츠";
+  try {
+    if (deal !== "longTermRental") {
+      return { capital, sourceId: id, available: false, note: "미취급" };
+    }
+    // 수입(EV) 렌트: 전기차 보조금은 지역·시기별 수기입력값이라 카탈로그에
+    // 없음 — 보조금을 몰라 견적이 실제보다 낮게 보이면 안 되므로 기본 0원
+    // (보조금 받으면 상담 시 더 낮아질 수 있다는 방향만 안전).
+    const q = quoteMeritzImportRental({
+      model: input.model,
+      vehiclePrice: input.vehiclePrice,
+      termMonths: input.termMonths,
+      annualMileageKm: input.annualMileageKm,
+      depositRate: input.depositRate,
+    });
+    return {
+      capital, sourceId: id, available: true,
+      monthlyPayment: q.monthlyPayment, annualRate: q.annualRate,
+      customerRate: q.customerRate, residualRate: q.residualRate,
+      residualValue: q.residualValue, deposit: 0, prepayment: 0,
+    };
+  } catch (e) {
+    return { capital, sourceId: id, available: false, note: e instanceof Error ? e.message : "계산 불가" };
+  }
+}
+
+function bnkOperatingLeaseQuote(id: string, deal: DealType, input: CapitalQuoteInput): CapitalQuoteRow {
+  const capital = "BNK캐피탈";
+  try {
+    if (deal !== "operatingLease") {
+      return { capital, sourceId: id, available: false, note: "미취급" };
+    }
+    // 딜러사별 제휴 우대금리(annualRate)는 우리 UI가 딜러사를 안 물어봐서
+    // 모른다 — 항상 "비제휴" 최고금리를 쓰는 안전한 기본값(quoteBnkOperatingLease
+    // 내부 기본값)을 그대로 사용한다. 실제로 제휴 딜러면 상담에서 더 낮아질 수 있음.
+    const q = quoteBnkOperatingLease({
+      model: input.model,
+      vehiclePrice: input.vehiclePrice,
+      termMonths: input.termMonths,
+      annualMileageKm: input.annualMileageKm,
+      depositRate: input.depositRate,
+    });
+    return {
+      capital, sourceId: id, available: true,
+      monthlyPayment: q.monthlyPayment, annualRate: q.annualRate,
+      customerRate: q.customerRate, residualRate: q.residualRate,
+      residualValue: q.residualValue, deposit: q.deposit, prepayment: q.prepayment,
+    };
+  } catch (e) {
+    return { capital, sourceId: id, available: false, note: e instanceof Error ? e.message : "계산 불가" };
+  }
+}
+
+function mgRentalQuote(id: string, deal: DealType, input: CapitalQuoteInput): CapitalQuoteRow {
+  const capital = "MG캐피탈";
+  try {
+    if (deal !== "longTermRental") {
+      return { capital, sourceId: id, available: false, note: "미취급" };
+    }
+    // 전기차보조금은 지역·시기별 수기입력값이라 카탈로그에 없음 — 기본 0원
+    // (몰라서 낮게 보이는 것보단 안전, 보조금 받으면 상담에서 더 낮아질 수 있음).
+    const q = quoteMgRental({
+      model: input.model,
+      vehiclePrice: input.vehiclePrice,
+      termMonths: input.termMonths,
+      annualMileageKm: input.annualMileageKm,
+    });
+    return {
+      capital, sourceId: id, available: true,
+      monthlyPayment: q.monthlyPayment, annualRate: q.annualRate,
+      customerRate: q.customerRate, residualRate: q.residualRate,
+      residualValue: q.residualValue, deposit: 0, prepayment: 0,
+    };
+  } catch (e) {
+    return { capital, sourceId: id, available: false, note: e instanceof Error ? e.message : "계산 불가" };
+  }
+}
+
+function mgLeaseQuote(id: string, deal: DealType, input: CapitalQuoteInput): CapitalQuoteRow {
+  const capital = "MG캐피탈";
+  try {
+    if (deal !== "operatingLease") {
+      return { capital, sourceId: id, available: false, note: "미취급" };
+    }
+    const q = quoteMgLease({
+      model: input.model,
+      vehiclePrice: input.vehiclePrice,
+      termMonths: input.termMonths,
+      depositRate: input.depositRate,
+    });
+    return {
+      capital, sourceId: id, available: true,
+      monthlyPayment: q.monthlyPayment, annualRate: q.annualRate,
+      customerRate: q.customerRate, residualRate: q.residualRate,
+      residualValue: q.residualValue, deposit: 0, prepayment: 0,
+    };
+  } catch (e) {
+    return { capital, sourceId: id, available: false, note: e instanceof Error ? e.message : "계산 불가" };
+  }
+}
+
 function evLeaseQuote(
   id: string,
   quoteFn: (input: {
@@ -317,6 +424,29 @@ function evLeaseQuote(
       vehiclePrice: input.vehiclePrice,
       termMonths: input.termMonths,
       annualMileageKm: input.annualMileageKm,
+      depositRate: input.depositRate,
+    });
+    return {
+      capital, sourceId: id, available: true,
+      monthlyPayment: q.monthlyPayment, annualRate: q.annualRate,
+      customerRate: q.customerRate, residualRate: q.residualRate,
+      residualValue: q.residualValue, deposit: q.deposit, prepayment: q.prepayment,
+    };
+  } catch (e) {
+    return { capital, sourceId: id, available: false, note: e instanceof Error ? e.message : "계산 불가" };
+  }
+}
+
+function polestarLeaseQuote(id: string, deal: DealType, input: CapitalQuoteInput): CapitalQuoteRow {
+  const capital = "메리츠";
+  try {
+    if (deal !== "operatingLease") {
+      return { capital, sourceId: id, available: false, note: "미취급" };
+    }
+    const q = quoteMeritzPolestarLease({
+      model: input.model,
+      vehiclePrice: input.vehiclePrice,
+      termMonths: input.termMonths,
       depositRate: input.depositRate,
     });
     return {
@@ -385,6 +515,38 @@ export const QUOTE_SOURCES: QuoteSource[] = [
     quote: (deal, input) => meritzDomesticRentalQuote("meritz-rental-domestic", deal, input),
   },
   {
+    id: "meritz-rental-import",
+    capital: "메리츠",
+    label: "수입(EV) 장기렌트",
+    deals: ["longTermRental"],
+    handles: (m) => findImportRentalVehicle(m) !== null,
+    quote: (deal, input) => meritzImportRentalQuote("meritz-rental-import", deal, input),
+  },
+  {
+    id: "bnk-operating-lease",
+    capital: "BNK캐피탈",
+    label: "운용리스",
+    deals: ["operatingLease"],
+    handles: (m) => findBnkVehicle(m) !== null,
+    quote: (deal, input) => bnkOperatingLeaseQuote("bnk-operating-lease", deal, input),
+  },
+  {
+    id: "mg-rental",
+    capital: "MG캐피탈",
+    label: "장기렌터카(EV)",
+    deals: ["longTermRental"],
+    handles: (m) => findMgRentalVehicle(m) !== null,
+    quote: (deal, input) => mgRentalQuote("mg-rental", deal, input),
+  },
+  {
+    id: "mg-lease",
+    capital: "MG캐피탈",
+    label: "운용리스",
+    deals: ["operatingLease"],
+    handles: (m) => findMgLeaseVehicle(m) !== null,
+    quote: (deal, input) => mgLeaseQuote("mg-lease", deal, input),
+  },
+  {
     id: "meritz-tesla-lease",
     capital: "메리츠",
     label: "테슬라 전용",
@@ -399,6 +561,14 @@ export const QUOTE_SOURCES: QuoteSource[] = [
     deals: ["operatingLease"],
     handles: (m) => findBydVehicle(m) !== null,
     quote: (deal, input) => evLeaseQuote("meritz-byd-lease", quoteMeritzBydLease, deal, input),
+  },
+  {
+    id: "meritz-polestar-lease",
+    capital: "메리츠",
+    label: "Polestar 전용",
+    deals: ["operatingLease"],
+    handles: (m) => findPolestarLeaseVehicle(m) !== null,
+    quote: (deal, input) => polestarLeaseQuote("meritz-polestar-lease", deal, input),
   },
 ];
 
