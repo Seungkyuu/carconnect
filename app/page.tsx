@@ -1,5 +1,5 @@
-import QuoteApp from "./quote-app";
+import CarConnectHome from "./home-content";
 
 export default function Home() {
-  return <QuoteApp />;
+  return <CarConnectHome />;
 }

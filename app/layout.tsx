@@ -2,56 +2,45 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "./providers";
 
-const TITLE = "렌토(RENTO) — 자동차 장기렌트·리스·법인 리스 비교";
+const TITLE = "카커넥트 미디어 — 프라이빗 모빌리티 어드바이저리";
 const DESCRIPTION =
-  "렌토(RENTO)는 자동차 장기렌트·리스·법인 리스 견적을 여러 금융사와 실시간으로 비교하는 플랫폼입니다. 차량을 고르면 최저가를 바로 확인할 수 있어요.";
+  "예산과 신용 조건을 먼저 파악해, 고객님께 맞는 오토금융 하나를 제안드립니다. 매입·매도부터 리스·렌트, 정비·세차·탁송까지 전담 매니저가 끝까지 함께합니다.";
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   keywords: [
-    "렌토",
-    "RENTO",
+    "카커넥트",
+    "카커넥트미디어",
+    "오토금융",
     "자동차 리스",
     "장기렌트",
-    "법인 리스",
-    "법인차 리스",
-    "리스 비교",
-    "렌트 비교",
-    "장기렌트 비교",
-    "차량 리스",
+    "차량관리 대행",
+    "탁송",
   ],
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
-    url: "https://rento-project.vercel.app",
-    siteName: "렌토(RENTO)",
+    siteName: "카커넥트 미디어",
     locale: "ko_KR",
     type: "website",
   },
-  verification: {
-    google: "Rw6U5zAI7wwxTD1-FyYmEms1kEsq9OgffTeHF6tOyOg",
-    other: {
-      "naver-site-verification": "1d7fc30cf0d998623e9414bcd8f5703a91af6596",
-    },
-  },
+  // ⚠ 구글/네이버 서치콘솔 소유확인 코드는 도메인마다 새로 발급받아야 한다
+  // (RENTO 코드를 그대로 두면 엉뚱한 사이트를 인증하려다 실패한다) — 실제
+  // 배포 도메인 확정 후 각 서치콘솔에서 새로 받아 채워 넣는다.
 };
 
+// ⚠ 사업자등록증 정보(대표자명·사업자등록번호·주소)를 받으면 address 필드를
+// 채워 구조화 데이터로 노출한다 — 확인 전까지는 잘못된 정보(RENTO 주소 등)를
+// 노출하느니 비워두는 쪽이 안전하다.
 const ORG_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "주식회사 RENTO",
-  alternateName: "렌토",
-  url: "https://rento-project.vercel.app",
+  name: "카커넥트 미디어",
   description: DESCRIPTION,
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "선릉로 129길 25",
-    addressLocality: "강남구",
-    addressRegion: "서울특별시",
-    addressCountry: "KR",
-  },
-  sameAs: ["https://blog.naver.com/leenkim_lease_"],
+  telephone: "010-9716-4560",
+  email: "car_connect@gmail.com",
+  faxNumber: "02-6953-4691",
 };
 
 export const viewport: Viewport = {
@@ -74,6 +63,13 @@ export default function RootLayout({
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+        {/* Noto Serif KR — 홈 화면 세리프 헤드라인·워드마크 전용(카커넥트 미디어
+            "워드마크 전용" 로고 C안, 얇은 획의 격식 있는 인상을 위해 사용). */}
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500&display=swap"
         />
         {/* 하이드레이션 전에 저장된 테마를 먼저 적용 — 라이트→다크 깜빡임 방지.
             기본값은 시스템 설정과 무관하게 항상 라이트 — 사용자가 토글을
