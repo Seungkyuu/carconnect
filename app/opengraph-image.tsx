@@ -22,6 +22,10 @@ export default function OpengraphImage() {
           fontFamily: "sans-serif",
         }}
       >
+        {/* ⚠ CCM 모노그램은 여기 넣지 않는다 — Satori가 SVG 원호의
+            large-arc-flag를 무시하고 짧은 쪽으로 그려서 C가 납작하게
+            찌그러진다. 모노그램은 실제 브라우저가 그리는 헤더·파비콘에서만
+            쓰고, OG 이미지는 워드마크로만 간다. */}
         <div
           style={{
             display: "flex",

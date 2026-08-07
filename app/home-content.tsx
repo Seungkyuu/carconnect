@@ -68,7 +68,7 @@ export default function CarConnectHome() {
       <header className={styles.header}>
         <div className={`${styles.wrap} ${styles.headerInner}`}>
           <a href="#top" aria-label="카커넥트 미디어 홈">
-            <Wordmark size="sm" showTagline={false} />
+            <Wordmark size="sm" showTagline={false} showMark />
           </a>
           <nav className={styles.nav} aria-label="주요 메뉴">
             {NAV.map((item) => (

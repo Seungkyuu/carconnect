@@ -1,5 +1,10 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="64" height="64" fill="#0d0c0a"/>
-  <ellipse cx="24" cy="32" rx="15" ry="19.5" stroke="#d4af6a" stroke-width="2" transform="rotate(-8 24 32)"/>
-  <ellipse cx="40" cy="32" rx="15" ry="19.5" stroke="#f2ede0" stroke-width="2" transform="rotate(8 40 32)"/>
+<svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- CCM 브래킷 모노그램. 16px 파비콘까지 줄어들므로 그라데이션 없이
+       단색 골드 + 굵은 획으로만 그린다(작은 크기에서 그라데이션은 탁해진다). -->
+  <rect width="100" height="100" fill="#0d0c0a"/>
+  <g stroke="#e0bd7a" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 41.3 37.1 A 20 20 0 1 1 41.3 62.9"/>
+    <path d="M 58.7 37.1 A 20 20 0 1 0 58.7 62.9"/>
+    <path d="M 42 70 V 30 L 50 50 L 58 30 V 70"/>
+  </g>
 </svg>
