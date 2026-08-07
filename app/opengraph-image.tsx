@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "렌토(RENTO) — 자동차 장기렌트·리스·법인 리스 비교";
+export const alt = "카커넥트 미디어 — 프라이빗 모빌리티 어드바이저리";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -15,42 +15,33 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          padding: "80px",
-          background: "#0f2044",
-          color: "#ffffff",
+          padding: "90px",
+          background: "#0d0c0a",
+          color: "#f2ede0",
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              border: "3px solid #ffffff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 30,
-              fontWeight: 800,
-            }}
-          >
-            R
-          </div>
-          <div style={{ display: "flex", fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>
-            <span>REN</span>
-            <span style={{ color: "#3dd6e8" }}>T</span>
-            <span>O</span>
-          </div>
+        <div
+          style={{
+            display: "flex",
+            fontSize: 42,
+            fontWeight: 500,
+            letterSpacing: 10,
+            borderBottom: "2px solid #d4af6a",
+            paddingBottom: 20,
+            width: "fit-content",
+          }}
+        >
+          CARCONNECT MEDIA
         </div>
-        <div style={{ display: "flex", fontSize: 40, fontWeight: 800, marginTop: 48, lineHeight: 1.4 }}>
-          자동차 장기렌트·리스·법인 리스
+        <div style={{ display: "flex", fontSize: 40, fontWeight: 700, marginTop: 52, lineHeight: 1.4 }}>
+          재무 상황까지 살펴, 최적의 오토금융을
         </div>
-        <div style={{ display: "flex", fontSize: 40, fontWeight: 800, lineHeight: 1.4 }}>
-          여러 금융사 견적을 한 번에 비교
+        <div style={{ display: "flex", fontSize: 40, fontWeight: 700, lineHeight: 1.4 }}>
+          제안드립니다
         </div>
-        <div style={{ display: "flex", fontSize: 24, color: "#a9bcf2", marginTop: 24 }}>
-          RENTO — Driven by Precision
+        <div style={{ display: "flex", fontSize: 24, color: "#a39b87", marginTop: 28 }}>
+          Private Mobility Advisory · 카커넥트 미디어
         </div>
       </div>
     ),
