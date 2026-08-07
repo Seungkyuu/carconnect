@@ -5,6 +5,10 @@ const PHONE = "010-9716-4560";
 const PHONE_HREF = "tel:01097164560";
 const EMAIL = "car_connect@gmail.com";
 const FAX = "02-6953-4691";
+const COMPANY_NAME = "주식회사 카커넥트 미디어";
+const CEO_NAME = "최우현";
+const BIZ_REG_NO = "464-88-03723";
+const COMPANY_ADDRESS = "서울특별시 강서구 공항대로 525, 15층 나-306호(등촌동, 비원오피스텔)";
 
 const NAV = [
   { label: "서비스", href: "#services" },
@@ -183,6 +187,13 @@ export default function CarConnectHome() {
             <span>{PHONE}</span>
             <span>{EMAIL}</span>
           </div>
+        </div>
+        <div className={styles.wrap}>
+          <p className={styles.footerLegal}>
+            {COMPANY_NAME} · {CEO_NAME} 대표 · {COMPANY_ADDRESS} · 사업자등록번호 {BIZ_REG_NO}
+            <br />
+            {PHONE} · {EMAIL} · 팩스 {FAX}
+          </p>
         </div>
       </footer>
     </div>

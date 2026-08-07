@@ -32,17 +32,24 @@ export const metadata: Metadata = {
   // 배포 도메인 확정 후 각 서치콘솔에서 새로 받아 채워 넣는다.
 };
 
-// ⚠ 사업자등록증 정보(대표자명·사업자등록번호·주소)를 받으면 address 필드를
-// 채워 구조화 데이터로 노출한다 — 확인 전까지는 잘못된 정보(RENTO 주소 등)를
-// 노출하느니 비워두는 쪽이 안전하다.
 const ORG_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  legalName: "주식회사 카커넥트 미디어",
   name: "카커넥트 미디어",
   description: DESCRIPTION,
+  founder: { "@type": "Person", name: "최우현" },
+  taxID: "464-88-03723",
   telephone: "010-9716-4560",
   email: "car_connect@gmail.com",
   faxNumber: "02-6953-4691",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "공항대로 525, 15층 나-306호(등촌동, 비원오피스텔)",
+    addressLocality: "강서구",
+    addressRegion: "서울특별시",
+    addressCountry: "KR",
+  },
 };
 
 export const viewport: Viewport = {
