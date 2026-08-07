@@ -1,21 +1,24 @@
 /* ─────────────────────────────────────────────────────────────
    카커넥트 미디어 홈 — 프라이빗 모빌리티 어드바이저리
    다른 4개 사이트(서동·탑고·렌토·오상민)의 "검색→비교" 도구형 UI와
-   의도적으로 다른 방향: 검색창 없음, 세리프 헤드라인, 크림+골드 톤의
-   에디토리얼 레이아웃. 전역 --ink/--accent 등은 RENTO 계열 톤(청록)이라
-   이 페이지 전용 토큰(--cc-*)을 별도로 둬서 충돌을 피한다.
+   의도적으로 다른 방향: 검색창 없음, 세리프 헤드라인, 짙은 배경+골드 톤의
+   에디토리얼 레이아웃(대표님 확정 — 크림보다 블랙이 더 고급스럽다는
+   판단). 시스템 라이트/다크와 무관하게 이 톤 하나로 고정 — 프라이빗
+   뱅킹·경매 카탈로그 같은 무드는 토글 없이 일관될 때 더 살아난다.
+   전역 --ink/--accent 등은 RENTO 계열 톤(청록)이라 이 페이지 전용
+   토큰(--cc-*)을 별도로 둬서 충돌을 피한다.
    ───────────────────────────────────────────────────────────── */
 
 .page {
-  --cc-bg: #f7f5f0;
-  --cc-paper: #ffffff;
-  --cc-ink: #201d17;
-  --cc-ink-soft: #6f6a5c;
-  --cc-ink-faint: #96907e;
-  --cc-line: #ddd7c8;
-  --cc-line-strong: #b9b09a;
-  --cc-accent: #a3813f;
-  --cc-accent-tint: rgba(163, 129, 63, 0.09);
+  --cc-bg: #0d0c0a;
+  --cc-paper: #17150f;
+  --cc-ink: #f2ede0;
+  --cc-ink-soft: #a39b87;
+  --cc-ink-faint: #736b58;
+  --cc-line: #2b2721;
+  --cc-line-strong: #453f31;
+  --cc-accent: #d4af6a;
+  --cc-accent-tint: rgba(212, 175, 106, 0.1);
 
   background: var(--cc-bg);
   color: var(--cc-ink);
@@ -43,7 +46,7 @@
   color: var(--cc-ink);
   white-space: nowrap;
 }
-.btn.primary { background: var(--cc-ink); border-color: var(--cc-ink); color: var(--cc-paper); }
+.btn.primary { background: var(--cc-accent); border-color: var(--cc-accent); color: var(--cc-bg); }
 .btn.lg { padding: 16px 32px; font-size: 14.5px; }
 
 /* ── 헤더 ─────────────────────────────────────────────────── */
@@ -51,7 +54,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(247, 245, 240, 0.92);
+  background: rgba(13, 12, 10, 0.86);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--cc-line);
 }

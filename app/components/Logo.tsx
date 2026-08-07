@@ -19,11 +19,11 @@ export function Wordmark({
     <div style={{ display: "inline-flex", flexDirection: "column", gap: 4 }}>
       <span
         style={{
-          fontFamily: "var(--font-serif)",
+          fontFamily: '"Noto Serif KR", Georgia, serif',
           fontSize: nameSize,
           fontWeight: 500,
           letterSpacing: tracking,
-          borderBottom: "1px solid var(--accent)",
+          borderBottom: "1px solid var(--cc-accent)",
           paddingBottom: size === "lg" ? 10 : 5,
           lineHeight: 1,
         }}
@@ -34,7 +34,7 @@ export function Wordmark({
         <span
           style={{
             fontSize: tagSize,
-            color: "var(--ink-soft)",
+            color: "var(--cc-ink-soft)",
             letterSpacing: "0.02em",
             fontWeight: 500,
           }}
