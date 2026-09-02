@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "./providers";
+// 도메인은 sitemap.ts·robots.ts와 공유하므로 lib/site-config.ts에서만 정의한다.
+import { SITE_NAME, SITE_URL } from "@/lib/site-config";
 
 const TITLE = "카커넥트 미디어 — 프라이빗 모빌리티 어드바이저리";
 const DESCRIPTION =
   "예산과 신용 조건을 먼저 파악해, 고객님께 맞는 오토금융 하나를 제안드립니다. 매입·매도부터 리스·렌트, 정비·세차·탁송까지 전담 매니저가 끝까지 함께합니다.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://carconnect-xi.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: TITLE,
   description: DESCRIPTION,
   keywords: [
@@ -22,8 +24,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
-    url: "https://carconnect-xi.vercel.app",
-    siteName: "카커넥트 미디어",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "ko_KR",
     type: "website",
   },
